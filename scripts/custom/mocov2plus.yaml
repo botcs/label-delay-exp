@@ -1,0 +1,81 @@
+defaults:
+  - _self_
+  - augmentations: symmetric_weak.yaml
+  - wandb: private.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+name: "mocov2plus"
+method: "mocov2plus"
+backbone:
+  name: "resnet18"
+  kwargs:
+    # weights: "IMAGENET1K_V2"
+    pretrained: True
+method_kwargs:
+  proj_hidden_dim: 2048
+  proj_output_dim: 256
+  queue_size: 65536
+  temperature: 0.2
+  scale_loss: 0.1
+momentum:
+  base_tau: 0.99
+  final_tau: 0.999
+data:
+  dataset: cloc
+  train_path: "~/github/solo-learn/datasets/"
+  num_workers: 14
+  prefetch_factor: 50
+category: "SSL"
+online:
+  sup_buffer_size: 40000
+  delay: 0
+  num_supervised: 1
+  num_unsupervised: 1
+  supervised_projection_head:
+    enabled: False
+    output_dim: 256
+    hidden_dim: 2048
+    num_layers: 2
+  supervised_param_names: ["backbone", "classifier"]
+  supervised_reset: False
+optimizer:
+  name: "sgd"
+  batch_size: 128
+  lr: 0.005
+  weight_decay: 3e-5
+  momentum: 0.9
+  classifier_lr: 0.005
+scheduler:
+  name: "warmup_cosine"
+  # name: "none"
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  train_time_interval: 3500 # seconds
+  # not using 3600 because the scheduler 
+  # usually shuts down the job at the full hour
+auto_resume:
+  enabled: False
+  max_hours: 10000000
+# overwrite PL stuff
+max_epochs: 1
+devices: [0]
+sync_batchnorm: True
+accelerator: "gpu"
+# strategy: "ddp"
+strategy: None
+precision: 16
+
+ckpt_path: "mocov2plus/resnet18-ep399.ckpt"
+# ckpt_path: None
+
+log_every_n_steps: 20
+# overfit_batches: 10
+debug_augmentations: True

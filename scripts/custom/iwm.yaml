@@ -1,0 +1,92 @@
+defaults:
+  - _self_
+  - augmentations: base.yaml
+  - wandb: private.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+name: "iwm"
+method: "iwm"
+backbone:
+  name: "resnet18"
+  kwargs:
+    # weights: "IMAGENET1K_V2"
+    pretrained: True
+method_kwargs:
+  scale_loss: 1.0
+  norm_feat: True
+  score_function: "inner"
+  selection_function: "softmax"
+  assignment_function:  "temperature" # "eps-greedy" "naive" "greedy" "eps-greedy" "hungarian"
+  alternating_sources: ["NW", "RW"]
+  assignment_function_eps: 0.0
+  base_temperature: 1.0
+  final_temperature: 1.0
+  use_temperature_schedule: False
+  use_fixed_features: False
+  use_logits_as_features: False
+  rescale_losses: False
+  cache_newest_unsup_features: True
+  class_balanced: True
+  num_workers: 4
+  prefetch_factor: 1
+data:
+  dataset: cloc
+  train_path: "~/github/solo-learn/datasets/"
+  num_workers: 12
+  prefetch_factor: 5
+category: "ours"
+online:
+  sup_buffer_size: 40000
+  delay: 0
+  num_supervised: 1
+  num_unsupervised: 1
+  supervised_projection_head:
+    enabled: False
+    output_dim: 256
+    hidden_dim: 2048
+    num_layers: 2
+  supervised_param_names: ["backbone", "classifier"]
+  share_backbone: True
+  supervision_source: "NRW"
+optimizer:
+  name: "sgd"
+  batch_size: 128
+  lr: 0.005
+  weight_decay: 1e-5
+  momentum: 0.9
+  classifier_lr: 0.005
+scheduler:
+  # name: "warmup_cosine"
+  name: "none"
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  train_time_interval: 300 # seconds
+  # not using 3600 because the scheduler 
+  # usually shuts down the job at the full hour
+auto_resume:
+  enabled: False
+  max_hours: 1000
+# overwrite PL stuff
+max_epochs: 1
+devices: [0]
+sync_batchnorm: True
+accelerator: "gpu"
+# strategy: "ddp"
+strategy: None
+precision: 32
+
+
+
+log_every_n_steps: 20
+log_histogram_every_n_steps: 100
+log_images_every_n_steps: 500
+debug_augmentations: True
+ckpt_path: ""
