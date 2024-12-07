@@ -1,5 +1,11 @@
-# Label Delay in Continual Learning
+# Label Delay in Online Continual Learning
+
+
+https://github.com/user-attachments/assets/3ee4d1fc-fe38-4f45-a1d1-73c8c4ac3885
+
+
 Supplementary material for our [NeurIPS paper](https://openreview.net/forum?id=m5CAnUui0Z)
+
 For the browser based demo, please visit the landing page: https://botcs.github.io/label-delay/
 
 This quick intro will help setting up our experimental framework to reproduce our results on the smallest dataset.
@@ -9,9 +15,9 @@ and provide a list of scripts to reproduce any result from the manuscript.
 
 ### Requirements
 1. working conda environment
-1. 1GB space for the Yearbook dataset by Ginosar et al.
-1. Active Weights and Biases account (https://wandb.ai/) for logging and reporting the results.
-1. (Optional but strongly preferred) CUDA compatible hardware
+2. 1GB space for the Yearbook dataset by Ginosar et al.
+3. Active Weights and Biases account (https://wandb.ai/) for logging and reporting the results.
+4. (Optional but strongly preferred) CUDA compatible hardware
 
 ### Setup
 1. To set the experimental environment up, run the following
@@ -20,7 +26,7 @@ conda env create -f environment.yaml
 conda activate label-delay
 ```
 
-1. To download the smallest dataset, Yearbook (N=37,921), run:
+2. To download the smallest dataset, Yearbook (N=37,921), run:
 ```
 wget -O faces_aligned_small_mirrored_co_aligned_cropped_cleaned.tar.gz "https://www.dropbox.com/scl/fi/7dv71y3nxrcdrpmwntr8e/faces_aligned_small_mirrored_co_aligned_cropped_cleaned.tar.gz?rlkey=h03r92h1mdr9yet2tkqosqq1k&dl=1"
 
@@ -34,13 +40,13 @@ wget https://raw.githubusercontent.com/katerakelly/yearbook-dating/master/data/f
 
 ```
 
-1. Run the training
+3. Run the training
 ```
 python main_delay.py --config-path=scripts/custom --config-name=iwm.yaml data.dataset=yearbook online.delay=50 online.num_supervised=16 online.sup_buffer_size=524288
 ```
 
 ### Credits
-These open source projects played a pivotal role in achieving the results reported in the manuscript:
+These open source projects played a pivotal role in our research:
 
 - https://github.com/vturrisi/solo-learn
 - https://github.com/ContinualAI/avalanche
@@ -52,13 +58,11 @@ These open source projects played a pivotal role in achieving the results report
 
 ### Citation
 _Update is coming with the NeurIPS '24 proceedings citation_
-
+```
 @article{csaba2023label,
   title={Label Delay in Continual Learning},
   author={Csaba, Botos and Zhang, Wenxuan and M{\"u}ller, Matthias and Lim, Ser-Nam and Elhoseiny, Mohamed and Torr, Philip and Bibi, Adel},
   journal={arXiv preprint arXiv:2312.00923},
   year={2023}
 }
-
-### Acknowledgement
-We thank the reviewers for investing time into examining our codebase and reproducing our experimental results.
+```
